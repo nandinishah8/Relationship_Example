@@ -14,7 +14,7 @@ namespace Relationship_Example.Models
         [Required]
         public DateTime BirthDate { get; set; }
 
-        [ForeignKey("User")]
+       // [ForeignKey("User")]
         [Required]
         public int UserId { get; set; }
         public User User { get; set; }
