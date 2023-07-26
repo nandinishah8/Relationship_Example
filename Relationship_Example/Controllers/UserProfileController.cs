@@ -32,9 +32,10 @@ namespace Relationship_Example.Controllers
 
         // GET api/userprofile/5
         [HttpGet("{id}")]
-        public IActionResult GetUserProfile(int id)
+        public async Task<IActionResult> GetUserProfile(int id)
         {
-            var userProfile = _dbContext.UserProfiles.Include(up => up.User).FirstOrDefault(up => up.Id == id);
+            var userProfile = await _dbContext.UserProfiles.Include(up => up.User)
+                                     .FirstOrDefaultAsync(up => up.Id == id);
 
             if (userProfile == null)
             {
@@ -46,7 +47,7 @@ namespace Relationship_Example.Controllers
                 Id = userProfile.Id,
                 FullName = userProfile.FullName,
                 BirthDate = userProfile.BirthDate
-                // Map other properties to the response as needed
+                
             };
 
             return Ok(userProfileResponse);
@@ -55,14 +56,15 @@ namespace Relationship_Example.Controllers
 
         // PUT api/userprofile/5
         [HttpPut("{id}")]
-        public IActionResult UpdateUserProfile(int id, UserProfileRequest userProfileRequest)
+        public async Task<IActionResult> UpdateUserProfile(int id, UserProfileRequest userProfileRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var userProfile = _dbContext.UserProfiles.Include(up => up.User).FirstOrDefault(up => up.Id == id);
+            var userProfile = await _dbContext.UserProfiles.Include(up => up.User)
+                                       .FirstOrDefaultAsync(up => up.Id == id);
 
             if (userProfile == null)
             {
@@ -71,57 +73,65 @@ namespace Relationship_Example.Controllers
 
             userProfile.FullName = userProfileRequest.FullName;
             userProfile.BirthDate = userProfileRequest.BirthDate;
-            // Update other properties as needed
+           
 
-            _dbContext.SaveChanges();
+            _dbContext.Entry(userProfile).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
 
             var userProfileResponse = new UserProfileResponse
             {
                 Id = userProfile.Id,
                 FullName = userProfile.FullName,
                 BirthDate = userProfile.BirthDate
-                // Map other properties to the response as needed
+               
             };
 
             return Ok(userProfileResponse);
         }
 
-
         // POST api/userprofile
         [HttpPost]
-        public IActionResult CreateUserProfile(UserProfileRequest userProfileRequest)
+        public async Task<IActionResult> CreateUserProfile(UserProfileRequest userProfileRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            var existingUser = _dbContext.Users.FirstOrDefault(u => u.Id == userProfileRequest.UserId);
+            if (existingUser == null)
+            {
+                return NotFound("User not found");
+            }
+
             var userProfile = new UserProfile
             {
                 FullName = userProfileRequest.FullName,
-                BirthDate = userProfileRequest.BirthDate
-                // Map other properties from the request as needed
+                BirthDate = userProfileRequest.BirthDate,
+                UserId = userProfileRequest.UserId
+
             };
 
             _dbContext.UserProfiles.Add(userProfile);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             var userProfileResponse = new UserProfileResponse
             {
                 Id = userProfile.Id,
                 FullName = userProfile.FullName,
                 BirthDate = userProfile.BirthDate
-                // Map other properties to the response as needed
+              
             };
 
             return Ok(userProfileResponse);
         }
 
+
         /// DELETE api/userprofile/5
         [HttpDelete("{id}")]
-        public IActionResult DeleteUserProfile(int id)
+        public async Task<IActionResult> DeleteUserProfile(int id)
         {
-            var userProfile = _dbContext.UserProfiles.FirstOrDefault(up => up.Id == id);
+            var userProfile = await _dbContext.UserProfiles.FirstOrDefaultAsync(up => up.Id == id);
 
             if (userProfile == null)
             {
@@ -129,7 +139,7 @@ namespace Relationship_Example.Controllers
             }
 
             _dbContext.UserProfiles.Remove(userProfile);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return NoContent();
         }
