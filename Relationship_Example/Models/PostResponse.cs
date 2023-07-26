@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Relationship_Example.Models
 {
-    public class Post
+    public class PostResponse
     {
-        [Key]
+
+        [Required]
         public int Id { get; set; }
 
         [Required]
@@ -14,8 +14,9 @@ namespace Relationship_Example.Models
         [Required]
         public string Content { get; set; }
 
-        [ForeignKey("User")]
+        [Required]
         public int UserId { get; set; }
-        public User User { get; set; }
+
+        public UserResponse User { get; set; }
     }
 }
