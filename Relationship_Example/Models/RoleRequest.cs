@@ -2,14 +2,9 @@
 
 namespace Relationship_Example.Models
 {
-    public class Role
+    public class RoleRequest
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         public string Name { get; set; }
-
-        public ICollection<User> Users { get; set; }
     }
 }
