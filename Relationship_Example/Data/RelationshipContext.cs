@@ -38,6 +38,7 @@ namespace Relationship_Example.Data
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Relationship_Example.Models.UserRole>? UserRole { get; set; }
 
        
 
