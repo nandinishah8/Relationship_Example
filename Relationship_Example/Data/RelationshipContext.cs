@@ -7,13 +7,10 @@ namespace Relationship_Example.Data
     {
         public RelationshipContext(DbContextOptions<RelationshipContext> options) : base(options) { }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.UserProfile)
                 .WithOne(p => p.User)
@@ -28,7 +25,21 @@ namespace Relationship_Example.Data
                 .HasMany(u => u.Roles)
                 .WithMany(r => r.Users)
                 .UsingEntity(j => j.ToTable("UserRoles"));
+
+
+            modelBuilder.Entity<User>().ToTable("Users");
+            modelBuilder.Entity<UserProfile>().ToTable("UserProfiles");
+            modelBuilder.Entity<Post>().ToTable("Posts");
+            modelBuilder.Entity<Role>().ToTable("Roles");
         }
+
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Role> Roles { get; set; }
+
+       
 
     }
 }
