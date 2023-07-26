@@ -65,8 +65,8 @@ namespace Relationship_Example.Controllers
             // Update properties from the request
             user.UserName = userRequest.UserName;
             user.Email = userRequest.Email;
-       
 
+            _dbContext.Entry(user).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
 
             // Map the updated User entity to the UserResponse
