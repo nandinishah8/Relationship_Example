@@ -23,17 +23,19 @@ namespace Relationship_Example.Controllers
 
         // GET api/user
         [HttpGet]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
-            var users = _dbContext.Users;
+            var users = await _dbContext.Users.Include(u => u.UserProfile).Include(u => u.Posts).Include(u => u.Roles).ToListAsync();
             return Ok(users);
         }
 
+
         // GET api/user/5
         [HttpGet("{id}")]
-        public IActionResult GetUser(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
-            var user = _dbContext.Users.FirstOrDefault(u => u.Id == id);
+            var user = await _dbContext.Users.Include(u => u.UserProfile).Include(u => u.Posts).Include(u => u.Roles)
+                                      .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
             {
@@ -45,15 +47,15 @@ namespace Relationship_Example.Controllers
 
         // PUT api/user/5
         [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, UserRequest userRequest)
+        public async Task<IActionResult> UpdateUser(int id, UserRequest userRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = _dbContext.Users.Include(u => u.UserProfile).Include(u => u.Posts).Include(u => u.Roles)
-                                      .FirstOrDefault(u => u.Id == id);
+            var user = await _dbContext.Users.Include(u => u.UserProfile).Include(u => u.Posts).Include(u => u.Roles)
+                                      .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
             {
@@ -63,9 +65,9 @@ namespace Relationship_Example.Controllers
             // Update properties from the request
             user.UserName = userRequest.UserName;
             user.Email = userRequest.Email;
-            // Update other properties as needed
 
-            _dbContext.SaveChanges();
+            _dbContext.Entry(user).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
 
             // Map the updated User entity to the UserResponse
             var userResponse = new UserResponse
@@ -73,15 +75,16 @@ namespace Relationship_Example.Controllers
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email
-                // Map other properties to the response as needed
+                
             };
 
             return Ok(userResponse);
         }
 
+
         // POST api/user
         [HttpPost]
-        public IActionResult CreateUser(UserRequest userRequest)
+        public async Task<IActionResult> CreateUser(UserRequest userRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -97,7 +100,7 @@ namespace Relationship_Example.Controllers
             };
 
             _dbContext.Users.Add(user);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             // Map the User entity to the UserResponse
             var userResponse = new UserResponse
@@ -111,11 +114,12 @@ namespace Relationship_Example.Controllers
             return Ok(userResponse);
         }
 
+
         // DELETE api/user/5
         [HttpDelete("{id}")]
-        public IActionResult DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = _dbContext.Users.FirstOrDefault(u => u.Id == id);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
             {
@@ -123,7 +127,7 @@ namespace Relationship_Example.Controllers
             }
 
             _dbContext.Users.Remove(user);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return NoContent();
         }
