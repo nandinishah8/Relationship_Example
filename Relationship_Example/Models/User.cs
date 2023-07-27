@@ -19,6 +19,8 @@ namespace Relationship_Example.Models
             public UserProfile UserProfile { get; set; }
             public ICollection<Post> Posts { get; set; }
             public ICollection<Role> Roles { get; set; }
+
+            public ICollection<UserRole> UserRoles { get; set; }
     }
 }
 
